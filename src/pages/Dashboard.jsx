@@ -1,348 +1,393 @@
 import React, { useState } from "react";
+import Sidebar from "../components/Sidebar";
+import DashboardNavbar from "../components/DashboardNavbar";
+import { motion } from "framer-motion";
 import {
+  ResponsiveContainer,
   PieChart,
   Pie,
+  Sector,
   Cell,
-  Tooltip,
-  Legend,
+  Tooltip as ReTooltip,
   BarChart,
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   LineChart,
   Line,
-  ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
-import { motion } from "framer-motion";
-import {
-  Menu,
-  X,
-  Users,
-  ListTodo,
-  FileText,
-  Settings,
-  LayoutDashboard,
-} from "lucide-react";
+import { FaUsers, FaTasks, FaChartLine } from "react-icons/fa";
 
-const stats = [
-  {
-    title: "Total Leads",
-    value: 328,
-    change: "+12% from last month",
-    positive: true,
-  },
-  {
-    title: "Active Clients",
-    value: 142,
-    change: "+8% from last month",
-    positive: true,
-  },
-  {
-    title: "Open Tasks",
-    value: 47,
-    change: "-3% from last week",
-    positive: false,
-  },
-  {
-    title: "Conversion Rate",
-    value: "24.5%",
-    change: "+2.1% from last month",
-    positive: true,
-  },
-];
+const renderActiveShape = (props) => {
+  const {
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    startAngle,
+    endAngle,
+    fill,
+    payload,
+    percent,
+    value,
+  } = props;
 
-const pieData = [
-  { name: "New", value: 35, color: "#2563eb" },
-  { name: "Contacted", value: 28, color: "#8b5cf6" },
-  { name: "Negotiation", value: 22, color: "#22c55e" },
-  { name: "Won", value: 10, color: "#facc15" },
-  { name: "Lost", value: 5, color: "#ef4444" },
-];
-
-const barData = [
-  { month: "Jan", leads: 45, clients: 10 },
-  { month: "Feb", leads: 55, clients: 15 },
-  { month: "Mar", leads: 50, clients: 18 },
-  { month: "Apr", leads: 60, clients: 20 },
-  { month: "May", leads: 52, clients: 19 },
-  { month: "Jun", leads: 70, clients: 22 },
-];
-
-const lineData = [
-  { month: "Jan", revenue: 14500 },
-  { month: "Feb", revenue: 18000 },
-  { month: "Mar", revenue: 17000 },
-  { month: "Apr", revenue: 21000 },
-  { month: "May", revenue: 20500 },
-  { month: "Jun", revenue: 25000 },
-];
-
-const activities = [
-  {
-    user: "John Doe",
-    action: "created a new lead",
-    target: "Acme Corp",
-    time: "2 hours ago",
-    color: "bg-blue-500",
-  },
-  {
-    user: "Jane Smith",
-    action: "completed task",
-    target: "Follow up with Tech Solutions",
-    time: "3 hours ago",
-    color: "bg-green-500",
-  },
-  {
-    user: "Mike Johnson",
-    action: "converted lead to client",
-    target: "StartupXYZ",
-    time: "5 hours ago",
-    color: "bg-purple-500",
-  },
-  {
-    user: "Sarah Williams",
-    action: "added a note to",
-    target: "Global Industries",
-    time: "1 day ago",
-    color: "bg-gray-500",
-  },
-  {
-    user: "Tom Brown",
-    action: "updated lead status",
-    target: "Enterprise Co",
-    time: "1 day ago",
-    color: "bg-indigo-500",
-  },
-];
-
-const Sidebar = ({ isOpen, toggleSidebar }) => (
-  <motion.aside
-    initial={{ x: -260 }}
-    animate={{ x: isOpen || window.innerWidth >= 1024 ? 0 : -260 }}
-    transition={{ type: "spring", stiffness: 120 }}
-    className={`fixed lg:static top-0 left-0 h-full lg:h-auto w-64 bg-white border-r shadow-md z-50 p-6 flex flex-col justify-between`}
-  >
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-purple-600">BizSuite</h2>
-        <button
-          className="lg:hidden p-2 rounded-md hover:bg-gray-100"
-          onClick={toggleSidebar}
-        >
-          <X size={22} />
-        </button>
-      </div>
-
-      <nav className="space-y-3">
-        {[
-          { name: "Dashboard", icon: <LayoutDashboard size={18} /> },
-          { name: "Clients", icon: <Users size={18} /> },
-          { name: "Tasks", icon: <ListTodo size={18} /> },
-          { name: "Notes", icon: <FileText size={18} /> },
-          { name: "Settings", icon: <Settings size={18} /> },
-        ].map((item, idx) => (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            key={idx}
-            className="flex items-center gap-3 w-full px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-all"
-          >
-            {item.icon} {item.name}
-          </motion.button>
-        ))}
-      </nav>
-    </div>
-
-    <div className="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-100 transition">
-      <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold">
-        A
-      </div>
-      <div>
-        <p className="font-medium text-gray-800">Admin User</p>
-        <p className="text-xs text-gray-500">admin@bizsuite.com</p>
-      </div>
-    </div>
-  </motion.aside>
-);
-
-const Dashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const RADIAN = Math.PI / 180;
+  const sin = Math.sin(-RADIAN * midAngle);
+  const cos = Math.cos(-RADIAN * midAngle);
+  const sx = cx + (outerRadius + 12) * cos;
+  const sy = cy + (outerRadius + 12) * sin;
+  const mx = cx + (outerRadius + 28) * cos;
+  const my = cy + (outerRadius + 28) * sin;
+  const ex = mx + (cos >= 0 ? 1 : -1) * 20;
+  const ey = my;
+  const textAnchor = cos >= 0 ? "start" : "end";
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-50 overflow-hidden">
-      {/* Sidebar */}
-      <div className="lg:block hidden">
-        <Sidebar isOpen={true} toggleSidebar={toggleSidebar} />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <div className="lg:hidden">
-        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-40 z-40"
-            onClick={toggleSidebar}
-          ></div>
-        )}
-      </div>
-
-      {/* Main Content */}
-      <motion.main
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex-1 flex flex-col overflow-y-auto lg:ml-64"
+    <g>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius}
+        outerRadius={outerRadius + 10}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+      />
+      <path
+        d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+        stroke={fill}
+        fill="none"
+      />
+      <circle cx={ex} cy={ey} r={3} fill={fill} />
+      <text
+        x={ex + (cos >= 0 ? 8 : -8)}
+        y={ey - 4}
+        textAnchor={textAnchor}
+        fill="#2b1b1a"
+        fontWeight={700}
       >
-        {/* Header */}
-        <header className="flex items-center justify-between px-6 py-4 bg-white shadow-sm border-b sticky top-0 z-30">
-          <div className="flex items-center gap-4">
-            <button
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100"
-              onClick={toggleSidebar}
-            >
-              <Menu size={22} />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-          </div>
-          <p className="text-sm text-gray-500">
-            Welcome back! Here's your business summary.
-          </p>
-        </header>
+        {payload.name}
+      </text>
+      <text
+        x={ex + (cos >= 0 ? 8 : -8)}
+        y={ey + 14}
+        textAnchor={textAnchor}
+        fill="#7a5653"
+        fontSize={13}
+      >
+        {value} ({Math.round(percent * 100)}%)
+      </text>
+    </g>
+  );
+};
 
-        {/* Content */}
+const Dashboard = () => {
+  const [activeIndex, setActiveIndex] = useState(null);
+
+  const cards = [
+    {
+      title: "Total Leads",
+      value: 234,
+      icon: <FaUsers />,
+      change: "+12.5%",
+      changeColor: "text-green-600",
+      sub: "from last month",
+    },
+    {
+      title: "Active Clients",
+      value: 89,
+      icon: <FaUsers />,
+      change: "+8.2%",
+      changeColor: "text-green-600",
+      sub: "from last month",
+    },
+    {
+      title: "Pending Tasks",
+      value: 42,
+      icon: <FaTasks />,
+      change: "-5.4%",
+      changeColor: "text-red-600",
+      sub: "from last month",
+    },
+    {
+      title: "Conversion Rate",
+      value: "24.8%",
+      icon: <FaChartLine />,
+      change: "+3.1%",
+      changeColor: "text-green-600",
+      sub: "from last month",
+    },
+  ];
+
+  const pieData = [
+    { name: "Contacted", value: 33 },
+    { name: "Negotiation", value: 24 },
+    { name: "Won", value: 15 },
+    { name: "New", value: 19 },
+    { name: "Lost", value: 9 },
+  ];
+  const pieColors = ["#fcb6a0", "#e99685", "#b27874", "#f3b3a1", "#d8b9b4"];
+
+  const barData = [
+    { name: "Website", value: 65 },
+    { name: "Social Media", value: 45 },
+    { name: "Email", value: 55 },
+    { name: "Direct", value: 35 },
+  ];
+
+  const lineData = [
+    { name: "Jan", value: 45 },
+    { name: "Feb", value: 52 },
+    { name: "Mar", value: 48 },
+    { name: "Apr", value: 62 },
+    { name: "May", value: 55 },
+    { name: "Jun", value: 68 },
+  ];
+
+  const recentActivity = [
+    {
+      name: "John Smith",
+      action: "contacted lead",
+      target: "ABC Corp",
+      time: "5 minutes ago",
+    },
+    {
+      name: "Sarah Johnson",
+      action: "completed task",
+      target: "Client Onboarding",
+      time: "15 minutes ago",
+    },
+    {
+      name: "Mike Davis",
+      action: "added note to",
+      target: "XYZ Industries",
+      time: "1 hour ago",
+    },
+    {
+      name: "Emily Brown",
+      action: "moved lead to Won",
+      target: "Tech Solutions Ltd",
+      time: "2 hours ago",
+    },
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-[#fffaf7] text-[#4a2d2a]">
+      <Sidebar />
+
+      <div className="flex-1 flex flex-col">
+        <DashboardNavbar />
+
         <div className="p-6 space-y-8">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, i) => (
+          <h2 className="text-lg font-medium">
+            Welcome back! Here's your business overview.
+          </h2>
+
+          {/* Top Stat Cards */}
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {cards.map((card, i) => (
               <motion.div
                 key={i}
-                whileHover={{ scale: 1.02 }}
-                className="p-6 rounded-xl shadow-md bg-white border border-gray-100 hover:shadow-lg transition"
+                whileHover={{ scale: 1.03 }}
+                transition={{ type: "spring", stiffness: 280 }}
+                className="bg-white p-5 rounded-2xl shadow-sm border border-[#f1e4e1]"
               >
-                <h3 className="text-gray-500 text-sm font-medium">
-                  {stat.title}
-                </h3>
-                <p className="text-4xl font-bold mt-3 text-gray-900">
-                  {stat.value}
-                </p>
-                <p
-                  className={`text-sm ${
-                    stat.positive ? "text-green-600" : "text-red-600"
-                  } font-semibold`}
-                >
-                  {stat.change}
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="bg-[#f8dcd3] text-[#b44d3b] text-3xl p-3 rounded-xl">
+                    {card.icon}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">{card.title}</p>
+                    <h2 className="text-2xl font-bold">{card.value}</h2>
+                  </div>
+                </div>
+                <p className={`text-sm ${card.changeColor}`}>
+                  {card.change}{" "}
+                  <span className="text-gray-500">{card.sub}</span>
                 </p>
               </motion.div>
             ))}
-          </div>
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Pie Chart */}
-            <motion.div className="p-6 rounded-xl shadow-md bg-white border border-gray-100">
-              <h3 className="font-semibold text-xl text-gray-800 mb-5">
-                Lead Status Distribution
-              </h3>
-              <ResponsiveContainer width="100%" height={350}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    label
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </motion.div>
-
-            {/* Bar Chart */}
-            <motion.div className="p-6 rounded-xl shadow-md bg-white border border-gray-100">
-              <h3 className="font-semibold text-xl text-gray-800 mb-5">
-                Monthly Leads vs Clients
-              </h3>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={barData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="month" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="leads" fill="#2563eb" />
-                  <Bar dataKey="clients" fill="#22c55e" />
-                </BarChart>
-              </ResponsiveContainer>
-            </motion.div>
-          </div>
-
-          {/* Line Chart */}
-          <motion.div className="p-6 rounded-xl shadow-md bg-white border border-gray-100">
-            <h3 className="font-semibold text-xl text-gray-800 mb-5">
-              Revenue Growth Trend
-            </h3>
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={lineData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="month" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#8b5cf6"
-                  strokeWidth={2}
-                  dot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
           </motion.div>
 
-          {/* Activity Feed */}
-          <motion.div className="p-6 rounded-xl shadow-md bg-white border border-gray-100">
-            <h3 className="font-semibold text-xl text-gray-800 mb-5">
-              Recent Activity
-            </h3>
-            <div className="space-y-5">
-              {activities.map((activity, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex items-center gap-4"
-                >
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* PIE CHART */}
+            <motion.div
+              className="bg-white rounded-2xl shadow-sm border border-[#f1e4e1] p-5"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 }}
+            >
+              <h3 className="font-semibold text-lg">Leads by Stage</h3>
+              <p className="text-gray-500 text-sm mb-3">
+                Distribution across pipeline stages
+              </p>
+
+              <div className="flex justify-center">
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100} // slightly larger for better cookie look
+                      paddingAngle={4}
+                      activeIndex={activeIndex}
+                      activeShape={renderActiveShape}
+                      onMouseEnter={(_, index) => setActiveIndex(index)}
+                      onMouseLeave={() => setActiveIndex(null)}
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={pieColors[index % pieColors.length]}
+                        />
+                      ))}
+                    </Pie>
+
+                    <ReTooltip
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        borderRadius: 10,
+                        border: "none",
+                        boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                      }}
+                      formatter={(value, name) => [`${value}`, name]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+
+            {/* BAR CHART */}
+            <motion.div
+              className="bg-white rounded-2xl shadow-sm border border-[#f1e4e1] p-5"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.18 }}
+            >
+              <h3 className="font-semibold text-lg">Leads by Source</h3>
+              <p className="text-gray-500 text-sm mb-3">
+                Where your leads are coming from
+              </p>
+
+              <div style={{ width: "100%", height: 220 }}>
+                <ResponsiveContainer>
+                  <BarChart data={barData}>
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#f3e9e7"
+                    />
+                    <ReTooltip
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        borderRadius: 8,
+                        border: "none",
+                      }}
+                    />
+                    <Bar dataKey="value" fill="#e5907f" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+
+            {/* LINE CHART */}
+            <motion.div
+              className="bg-white rounded-2xl shadow-sm border border-[#f1e4e1] p-5"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.24 }}
+            >
+              <h3 className="font-semibold text-lg">Sales Trends</h3>
+              <p className="text-gray-500 text-sm mb-3">
+                Monthly sales performance
+              </p>
+
+              <div style={{ width: "100%", height: 220 }}>
+                <ResponsiveContainer>
+                  <LineChart data={lineData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f3e9e7" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis />
+                    <ReTooltip
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        borderRadius: 8,
+                        border: "none",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#d36f5e"
+                      strokeWidth={3}
+                      dot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* RECENT ACTIVITY */}
+          <motion.div
+            className="bg-white rounded-2xl shadow-sm border border-[#f1e4e1] p-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.32 }}
+          >
+            <h3 className="font-semibold text-lg mb-3">Recent Activity</h3>
+            <p className="text-gray-500 text-sm mb-4">
+              Latest updates from your team
+            </p>
+
+            <div className="space-y-3">
+              {recentActivity.map((item, i) => {
+                const initials = item.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase();
+
+                return (
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${activity.color}`}
+                    key={i}
+                    className="flex items-center gap-4 bg-[#fef8f7] hover:bg-[#fceeea] transition rounded-xl p-3"
                   >
-                    {activity.user
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
+                    <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold bg-gradient-to-tr from-[#ffd8cf] to-[#f6b8ac] text-[#7a3a33]">
+                      {initials}
+                    </div>
+
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">
+                        {item.name}{" "}
+                        <span className="font-normal text-gray-700">
+                          {item.action}
+                        </span>{" "}
+                        <span className="font-semibold">{item.target}</span>
+                      </p>
+                      <p className="text-xs text-gray-500">{item.time}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-base text-gray-800">
-                      <span className="font-semibold">{activity.user}</span>{" "}
-                      {activity.action}{" "}
-                      <span className="font-medium text-gray-600">
-                        {activity.target}
-                      </span>
-                    </p>
-                    <p className="text-sm text-gray-500">{activity.time}</p>
-                  </div>
-                </motion.div>
-              ))}
+                );
+              })}
             </div>
           </motion.div>
         </div>
-      </motion.main>
+      </div>
     </div>
   );
 };
