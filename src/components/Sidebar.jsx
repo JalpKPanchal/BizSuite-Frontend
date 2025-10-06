@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -10,17 +11,26 @@ import {
 } from "lucide-react";
 
 const Sidebar = () => {
-  const [active, setActive] = useState("Dashboard");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={18} /> },
-    { name: "Clients", icon: <Users size={18} /> },
-    { name: "Leads", icon: <UserPlus size={18} /> },
-    { name: "Tasks", icon: <CheckSquare size={18} /> },
-    { name: "Notes", icon: <StickyNote size={18} /> },
-    { name: "Activity", icon: <Activity size={18} /> },
-    { name: "Settings", icon: <Settings size={18} /> },
+    {
+      name: "Dashboard",
+      icon: <LayoutDashboard size={18} />,
+      path: "/dashboard",
+    },
+    { name: "Clients", icon: <Users size={18} />, path: "/clients" },
+    { name: "Leads", icon: <UserPlus size={18} />, path: "/leads" },
+    { name: "Tasks", icon: <CheckSquare size={18} />, path: "/tasks" },
+    { name: "Notes", icon: <StickyNote size={18} />, path: "/notes" },
+    { name: "Activity", icon: <Activity size={18} />, path: "/activity" },
+    { name: "Settings", icon: <Settings size={18} />, path: "/settings" },
   ];
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
   return (
     <aside className="h-screen w-64 bg-red-300 text-white flex flex-col p-5">
@@ -35,9 +45,9 @@ const Sidebar = () => {
         {menuItems.map((item) => (
           <button
             key={item.name}
-            onClick={() => setActive(item.name)}
+            onClick={() => handleNavigation(item.path)}
             className={`flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              active === item.name
+              location.pathname === item.path
                 ? "bg-white text-rose-600 shadow-sm"
                 : "text-rose-100 hover:bg-rose-300/30"
             }`}
