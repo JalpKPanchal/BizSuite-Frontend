@@ -4,6 +4,8 @@ import AuthPage from "./pages/AuthPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
+import Clients from "./pages/Clients";
+import Leads from "./pages/Leads";
 
 // Converted App to named export
 export function App() {
@@ -23,6 +25,8 @@ export function App() {
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/clients" element={<Clients/>} />
+        <Route path="/leads" element={<Leads/>} />
 
 
         {/* Fallback redirect */}

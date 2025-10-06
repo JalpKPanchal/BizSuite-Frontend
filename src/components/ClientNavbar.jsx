@@ -5,7 +5,7 @@ const DashboardNavbar = () => {
   return (
     <header className="flex items-center justify-between bg-white border-b px-6 py-3 shadow-sm">
       {/* Left Section */}
-      <h1 className="text-xl font-semibold text-gray-800">Dashboard</h1>
+      <h1 className="text-xl font-semibold text-gray-800">Clients</h1>
 
       {/* Middle Section - Search */}
       <div className="flex-1 flex justify-center">
